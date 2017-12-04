@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Message from './Message';
 import NewMessageEntry from './NewMessageEntry';
 import axios from 'axios';
-import store, {gotMessagesFromServer} from './store'
+import store, {gotNewMessagesFromServer} from './store'
 
 export default class MessagesList extends Component {
 
@@ -15,12 +15,13 @@ export default class MessagesList extends Component {
     axios.get('/api/messages')
       .then(res => res.data)
       .then(messages => {
-        const action = gotMessagesFromServer(messages);
+        const action = gotNewMessagesFromServer(messages);
+        console.log(messages)
         store.dispatch(action);
       });
 
     this.unsubscribe = store.subscribe(() => {
-        this.setState(store.getState);
+        this.setState(store.getState());
     });
   }
 
@@ -28,6 +29,9 @@ export default class MessagesList extends Component {
     this.unsubscribe();
   }
 
+  updateMessages(){
+
+  }
   // handleMessage () {
   //   store.dispatch(gotMessagesFromServer());
   // }
@@ -36,6 +40,7 @@ export default class MessagesList extends Component {
 
     const channelId = Number(this.props.match.params.channelId); // because it's a string "1", not a number!
     const messages = this.state.messages;
+    console.log('message', messages)
     const filteredMessages = messages.filter(message => message.channelId === channelId);
 
     return (
@@ -43,7 +48,7 @@ export default class MessagesList extends Component {
         <ul className="media-list">
           { filteredMessages.map(message => <Message message={message} key={message.id} />) }
         </ul>
-        <NewMessageEntry />
+        <NewMessageEntry channelId={channelId} />
       </div>
     );
   }
